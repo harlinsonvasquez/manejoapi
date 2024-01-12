@@ -1,0 +1,172 @@
+
+ <!DOCTYPE html>
+ <html lang="es">
+ <head>
+   <meta charset="UTF-8">
+  
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+   <title>Formulario y Tabla con API</title>
+ </head>
+ <body>
+ 
+   <script>
+     const apiUrl = "https://memin.io/public/api/users"; // URL de la API ficticia
+ 
+     const formulario = document.createElement("form");
+     formulario.id = "miFormulario";
+ 
+     // Crear elemento de input para el campo ID
+     const inputId = document.createElement("input");
+     inputId.type = "hidden"; // Campo oculto
+     inputId.name = "id";
+     formulario.appendChild(inputId);
+ 
+     const inputNombre = document.createElement("input");
+     inputNombre.type = "text";
+     inputNombre.placeholder = "Nombre";
+     formulario.appendChild(inputNombre);
+ 
+     const inputCorreo = document.createElement("input");
+     inputCorreo.type = "text";
+     inputCorreo.placeholder = "Correo";
+     formulario.appendChild(inputCorreo);
+ 
+     const botonCrearActualizar = document.createElement("button");
+     botonCrearActualizar.id='botoncrear';
+     botonCrearActualizar.innerText = "Crear / Actualizar";
+     formulario.appendChild(botonCrearActualizar);
+ 
+     const tabla = document.createElement("table");
+     tabla.border = "1";
+ 
+     const thead = document.createElement("thead");
+     const encabezado = document.createElement("tr");
+     encabezado.innerHTML = "<th>Id</th><th>Nombre</th><th>Correo</th><th>Acciones</th>";
+     thead.appendChild(encabezado);
+ 
+     const tbody = document.createElement("tbody");
+     tbody.id = "tablaCuerpo";
+ 
+     tabla.appendChild(thead);
+     tabla.appendChild(tbody);
+ 
+     document.body.appendChild(formulario);
+     document.body.appendChild(tabla);
+ 
+     let datos = []; // Almacena los datos cargados desde la API
+ 
+     function inicializarTabla() {
+       tbody.innerHTML = "";
+ 
+       datos.forEach((dato, index) => {
+         const fila = document.createElement("tr");
+         fila.innerHTML = `
+           <td>${dato.id}</td>
+           <td>${dato.name}</td>
+           <td>${dato.email}</td>
+           <td>
+             <button onclick="editar(${index})">Editar</button>
+             <button onclick="eliminar(${dato.id})">Eliminar</button>
+           </td>
+         `;
+         tbody.appendChild(fila);
+       });
+     }
+ 
+     function cargarDatosDesdeAPI() {
+       fetch(apiUrl)
+         .then(response => response.json())
+         .then(data => {
+           // Almacena los datos cargados desde la API
+           datos = data;
+           inicializarTabla();
+         })
+         .catch(error => console.error("Error al cargar datos desde la API:", error));
+     }
+ 
+     // Función para agregar o actualizar un elemento
+     function crearActualizarDato() {
+       const nuevoDato = {
+         id: inputId.value,
+         name: inputNombre.value,
+         email: inputCorreo.value
+       };
+ 
+       // URL de la API
+       const urlApi = apiUrl + (nuevoDato.id ? `/${nuevoDato.id}` : '');
+ 
+       // Opciones de la solicitud
+       const opcionesSolicitud = {
+         method: nuevoDato.id ? "PUT" : "POST", // Usa PUT para actualizaciones y POST para nuevas creaciones
+         headers: {
+           "Content-Type": "application/json"
+         },
+         body: JSON.stringify(nuevoDato)
+       };
+ 
+       // Realiza la solicitud
+       fetch(urlApi, opcionesSolicitud)
+         .then(response => response.json())
+         .then(respuesta => {
+           // Maneja la respuesta del servidor (puede ser necesario dependiendo de tu implementación)
+           console.log("Respuesta del servidor:", respuesta);
+           
+           // Después de enviar datos, actualiza la tabla y realiza otras acciones si es necesario
+           cargarDatosDesdeAPI();
+         })
+         .catch(error => console.error("Error al enviar datos al servidor:", error));
+     }
+      // Función para actualizar la tabla sin recargar la página
+    function actualizarTabla() {
+      inicializarTabla();
+    }
+ 
+     // ...
+ 
+     // Evento de click para el botón Crear/Actualizar
+     botonCrearActualizar.addEventListener("click", crearActualizarDato);    
+ 
+     function editar(indice) {
+       const dato = datos[indice];
+       inputId.value = dato.id; // Actualiza el campo ID oculto
+       inputNombre.value = dato.name;
+       inputCorreo.value = dato.email;
+     }
+ 
+     function eliminar(id) {
+       fetch(`${apiUrl}/${id}`, {
+         method: 'DELETE',
+       })
+       .then(response => response.json())
+       .then(data => {
+         console.log('Dato eliminado:', data);
+         cargarDatosDesdeAPI();
+       })
+       .catch(error => console.error('Error al eliminar el dato:', error));
+     }
+ 
+     window.addEventListener("DOMContentLoaded", () => {
+       cargarDatosDesdeAPI();
+ 
+       formulario.addEventListener("submit", event => {
+         event.preventDefault();
+ 
+         const nuevoDato = {
+           id: inputId.value, // Toma el ID del campo oculto
+           name: inputNombre.value,
+           email: inputCorreo.value
+         };
+ 
+         
+ 
+         // Después de agregar o actualizar, puedes volver a cargar los datos desde la API y actualizar la tabla
+         cargarDatosDesdeAPI();
+       });
+     });
+   </script>
+ 
+ </body>
+ </html>
+ 
+ 

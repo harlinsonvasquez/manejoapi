@@ -1,0 +1,32 @@
+/* Estilos para el formulario */
+#miFormulario {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f58f8f;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  input{
+    border-radius: 10px;
+    width:35%;
+    height: 30px;
+    margin-left: 20px;
+  }
+  #botoncrear{
+    margin-left: 10px;
+    height: 30px;
+  }
+  
+  /* Estilos para la tabla */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    border: 1px solid rgba(10, 10, 10, 0.867);
+    padding: 8px;
+    text-align: left;
+  }
